@@ -1,4 +1,4 @@
-const CACHE_NAME = "chiiin-v3";
+const CACHE_NAME = "chiiin-v4";
 const ASSETS = [
   "./",
   "./index.html",

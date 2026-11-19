@@ -1,5 +1,5 @@
 (() => {
-  const COMPARISON_WATTS = [500, 600, 700, 800, 1000, 1500];
+  const COMPARISON_WATTS = [200, 500, 600, 650, 1000, 1500];
 
   const sourceWattEl = document.getElementById("source-watt");
   const targetWattEl = document.getElementById("target-watt");
