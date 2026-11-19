@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#faf7f2" />
+  <meta name="description" content="冷凍食品のワット数と加熱時間をかんたん換算できる計算アプリ" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Chiiin" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" sizes="180x180" />
+  <title>Chiiin - 電子レンジ時間計算</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="header">
+      <div class="logo-badge" aria-hidden="true">
+        <img src="icons/icon.svg" alt="" width="40" height="40" />
+      </div>
+      <div class="header-text">
+        <h1 class="brand-title">Ch<span class="brand-accent">iii</span>n</h1>
+        <p class="subtitle">電子レンジ ワット数・時間計算</p>
+      </div>
+    </header>
+
+    <!-- 画面上部に固定される計算結果エリア -->
+    <section class="sticky-result-wrap" aria-label="計算結果">
+      <div class="card result-card">
+        <div class="result-top">
+          <span class="result-badge" id="result-summary-badge">500W 3分00秒 → 600W</span>
+          <span class="result-rounded-pill" id="result-rounded">目安 <strong>2分30秒</strong></span>
+        </div>
+
+        <div class="result-display" aria-live="polite">
+          <div class="result-main" id="result-main">
+            <span class="result-num" id="res-min">2</span><span class="result-unit">分</span>
+            <span class="result-num" id="res-sec">30</span><span class="result-unit">秒</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="main-stack">
+      <!-- 入力パネル -->
+      <section class="card input-card" aria-label="換算条件の入力">
+        <!-- 1. 変換元ワット数 -->
+        <div class="field-group">
+          <div class="field-header">
+            <label for="source-watt" class="field-label">
+              <span class="step-num">1</span>
+              パッケージ記載のW
+            </label>
+            <div class="watt-input-wrap">
+              <input
+                type="number"
+                id="source-watt"
+                class="num-input"
+                value="500"
+                min="1"
+                max="5000"
+                step="10"
+                inputmode="numeric"
+              />
+              <span class="unit">W</span>
+            </div>
+          </div>
+          <div class="preset-row" data-target="source-watt" role="group" aria-label="変換元ワット数のプリセット">
+            <button type="button" class="preset-btn active" data-value="500">500W</button>
+            <button type="button" class="preset-btn" data-value="600">600W</button>
+            <button type="button" class="preset-btn" data-value="700">700W</button>
+            <button type="button" class="preset-btn" data-value="800">800W</button>
+            <button type="button" class="preset-btn" data-value="1000">1000W</button>
+            <button type="button" class="preset-btn" data-value="1500">1500W</button>
+          </div>
+        </div>
+
+        <!-- 2. 加熱時間 -->
+        <div class="field-group">
+          <div class="field-header">
+            <span class="field-label">
+              <span class="step-num">2</span>
+              記載の加熱時間
+            </span>
+            <button type="button" id="reset-time-btn" class="text-btn">クリア</button>
+          </div>
+
+          <div class="time-inputs">
+            <div class="time-box">
+              <div class="stepper">
+                <button type="button" class="step-btn" data-adjust="min" data-delta="-1" aria-label="1分減らす">−</button>
+                <div class="time-val-wrap">
+                  <input
+                    type="number"
+                    id="source-min"
+                    class="time-input"
+                    value="3"
+                    min="0"
+                    max="180"
+                    inputmode="numeric"
+                    aria-label="分"
+                  />
+                  <span class="time-unit">分</span>
+                </div>
+                <button type="button" class="step-btn" data-adjust="min" data-delta="1" aria-label="1分増やす">＋</button>
+              </div>
+            </div>
+
+            <div class="time-box">
+              <div class="stepper">
+                <button type="button" class="step-btn" data-adjust="sec" data-delta="-10" aria-label="10秒減らす">−</button>
+                <div class="time-val-wrap">
+                  <input
+                    type="number"
+                    id="source-sec"
+                    class="time-input"
+                    value="0"
+                    min="0"
+                    max="59"
+                    inputmode="numeric"
+                    aria-label="秒"
+                  />
+                  <span class="time-unit">秒</span>
+                </div>
+                <button type="button" class="step-btn" data-adjust="sec" data-delta="10" aria-label="10秒増やす">＋</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="quick-time-row" role="group" aria-label="よくある加熱時間">
+            <button type="button" class="chip-btn" data-min="1" data-sec="0">1分</button>
+            <button type="button" class="chip-btn" data-min="2" data-sec="0">2分</button>
+            <button type="button" class="chip-btn" data-min="3" data-sec="0">3分</button>
+            <button type="button" class="chip-btn" data-min="3" data-sec="30">3分30秒</button>
+            <button type="button" class="chip-btn" data-min="5" data-sec="0">5分</button>
+            <button type="button" class="chip-btn" data-min="6" data-sec="0">6分</button>
+          </div>
+        </div>
+
+        <!-- 入れ替えバー -->
+        <div class="swap-divider">
+          <button type="button" id="swap-btn" class="swap-btn" title="ワット数を入れ替える">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 16V4m0 0L3 8m4-4l4 4" />
+              <path d="M17 8v12m0 0l4-4m-4 4l-4-4" />
+            </svg>
+            <span>ワット数を入れ替え</span>
+          </button>
+        </div>
+
+        <!-- 3. 変換先ワット数 -->
+        <div class="field-group">
+          <div class="field-header">
+            <label for="target-watt" class="field-label">
+              <span class="step-num step-num-accent">3</span>
+              使用するレンジのW
+            </label>
+            <div class="watt-input-wrap">
+              <input
+                type="number"
+                id="target-watt"
+                class="num-input"
+                value="600"
+                min="1"
+                max="5000"
+                step="10"
+                inputmode="numeric"
+              />
+              <span class="unit">W</span>
+            </div>
+          </div>
+          <div class="preset-row" data-target="target-watt" role="group" aria-label="変換先ワット数のプリセット">
+            <button type="button" class="preset-btn" data-value="500">500W</button>
+            <button type="button" class="preset-btn active" data-value="600">600W</button>
+            <button type="button" class="preset-btn" data-value="700">700W</button>
+            <button type="button" class="preset-btn" data-value="800">800W</button>
+            <button type="button" class="preset-btn" data-value="1000">1000W</button>
+            <button type="button" class="preset-btn" data-value="1500">1500W</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 簡易タイマー -->
+      <section class="card timer-card" aria-label="カウントダウンタイマー">
+        <div class="timer-header">
+          <span class="card-title-inline">このままタイマーを使う</span>
+          <span class="timer-countdown" id="timer-display">02:30</span>
+        </div>
+        <div class="timer-progress-bar">
+          <div class="timer-progress-fill" id="timer-progress"></div>
+        </div>
+        <div class="timer-controls">
+          <button type="button" id="timer-start-btn" class="primary-btn">スタート</button>
+          <button type="button" id="timer-reset-btn" class="secondary-btn">リセット</button>
+        </div>
+      </section>
+
+      <!-- ワット数別 早見表 -->
+      <section class="card table-card" aria-label="他のワット数での目安">
+        <h2 class="card-title">他のワット数での目安</h2>
+        <div class="quick-grid" id="comparison-grid">
+          <!-- JSで生成 -->
+        </div>
+      </section>
+
+      <!-- 計算式の確認（折りたたみ） -->
+      <details class="card formula-details">
+        <summary class="formula-summary">計算式を見る</summary>
+        <p class="formula-text" id="formula-text">180秒 × (500W ÷ 600W) = 150.0秒</p>
+      </details>
+
+      <!-- ホーム画面に追加 案内バナー -->
+      <aside class="card install-banner" id="install-banner" aria-label="ホーム画面に追加" hidden>
+        <div class="install-banner-body">
+          <div class="install-icon-wrap" aria-hidden="true">
+            <img src="icons/icon-192.png" alt="" width="40" height="40" />
+          </div>
+          <div class="install-text">
+            <p class="install-title">Chiiin をホーム画面に追加</p>
+            <p class="install-desc">アプリのようにオフラインでもすぐ使えます</p>
+          </div>
+          <button type="button" class="install-close-btn" id="install-close-btn" aria-label="閉じる">×</button>
+        </div>
+        <button type="button" class="install-action-btn" id="install-action-btn">ホーム画面に追加</button>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <p>※機種や食品の量・冷え具合により温まり方は異なります。様子を見ながら追加加熱してください。</p>
+    </footer>
+  </div>
+
+  <!-- iOS / 手動追加用ガイドモーダル -->
+  <div class="modal-backdrop" id="install-modal" role="dialog" aria-modal="true" aria-labelledby="install-modal-title" hidden>
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 id="install-modal-title">ホーム画面への追加方法</h2>
+        <button type="button" class="modal-close-btn" id="install-modal-close" aria-label="閉じる">×</button>
+      </div>
+      <ol class="install-steps" id="install-steps">
+        <!-- JSでOSに合わせて表示 -->
+      </ol>
+      <button type="button" class="primary-btn modal-ok-btn" id="install-modal-ok">わかりました</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
